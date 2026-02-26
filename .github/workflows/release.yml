@@ -1,0 +1,52 @@
+name: build-and-release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+        python-version: ["3.11"]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python -m pip install pyinstaller
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pyinstaller --noconfirm --clean --windowed --onefile --name "NotebookLM-Companion" notebooklm_companion/gui_app.py
+          powershell -Command "Compress-Archive -Path dist\NotebookLM-Companion.exe -DestinationPath dist\NotebookLM-Companion-windows.zip"
+
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          pyinstaller --noconfirm --clean --windowed --name "NotebookLM-Companion" notebooklm_companion/gui_app.py
+          ditto -c -k --sequesterRsrc --keepParent "dist/NotebookLM-Companion.app" "dist/NotebookLM-Companion-macos.zip"
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/NotebookLM-Companion-windows.zip
+            dist/NotebookLM-Companion-macos.zip
