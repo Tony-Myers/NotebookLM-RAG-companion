@@ -33,24 +33,16 @@ jobs:
           python -m pip install -e .
           python -m pip install pyinstaller
 
-      - name: Build Windows executable
+      - name: Build (Windows)
         if: runner.os == 'Windows'
         run: |
-          pyinstaller --noconfirm --clean --windowed --onefile `
-            --name "NotebookLM-Companion" `
-            --collect-submodules notebooklm_companion `
-            --hidden-import notebooklm_companion.cli `
-            notebooklm_companion/gui_app.py
+          pyinstaller --noconfirm --clean NotebookLM-Companion.spec
           powershell -Command "Compress-Archive -Path dist\NotebookLM-Companion.exe -DestinationPath dist\NotebookLM-Companion-windows.zip"
 
-      - name: Build macOS app
+      - name: Build (macOS)
         if: runner.os == 'macOS'
         run: |
-          pyinstaller --noconfirm --clean --windowed \
-            --name "NotebookLM-Companion" \
-            --collect-submodules notebooklm_companion \
-            --hidden-import notebooklm_companion.cli \
-            notebooklm_companion/gui_app.py
+          pyinstaller --noconfirm --clean NotebookLM-Companion.spec
           ditto -c -k --sequesterRsrc --keepParent "dist/NotebookLM-Companion.app" "dist/NotebookLM-Companion-macos.zip"
 
       - name: Upload artifacts to Release
