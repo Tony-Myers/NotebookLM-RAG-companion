@@ -4,7 +4,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
-from notebooklm_companion.cli import run as cli_run
+from notebooklm_companion.core import main as core_main
 
 
 APP_TITLE = "NotebookLM Companion Generator"
@@ -14,7 +14,7 @@ def _run_generation(pdf_path: Path, done_callback):
     try:
         args = [str(pdf_path), "-f", "restructured"]
         try:
-            cli_run(args)
+            core_main(args)
         except SystemExit as e:
             if getattr(e, "code", 0) not in (0, None):
                 raise RuntimeError(f"Generator exited with code {e.code}") from None
