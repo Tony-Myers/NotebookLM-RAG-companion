@@ -36,13 +36,13 @@ jobs:
       - name: Build (Windows)
         if: runner.os == 'Windows'
         run: |
-          pyinstaller --noconfirm --clean NotebookLM-Companion.spec
-          powershell -Command "Compress-Archive -Path dist\NotebookLM-Companion.exe -DestinationPath dist\NotebookLM-Companion-windows.zip"
+          pyinstaller --noconfirm --clean NotebookLM-Companion-windows.spec
+          powershell -Command "Compress-Archive -Path dist\NotebookLM-Companion\* -DestinationPath dist\NotebookLM-Companion-windows.zip"
 
       - name: Build (macOS)
         if: runner.os == 'macOS'
         run: |
-          pyinstaller --noconfirm --clean NotebookLM-Companion.spec
+          pyinstaller --noconfirm --clean NotebookLM-Companion-macos.spec
           ditto -c -k --sequesterRsrc --keepParent "dist/NotebookLM-Companion.app" "dist/NotebookLM-Companion-macos.zip"
 
       - name: Upload artifacts to Release
